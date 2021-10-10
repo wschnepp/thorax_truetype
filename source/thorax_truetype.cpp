@@ -15,7 +15,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "thorax_truetype.h"
+// modified 10.10.2021 (Wilhelm Schnepp): change include path to match adjusted cmake file structure
+
+#include <thorax_truetype/thorax_truetype.h>
 
 unsigned CharacterMap00::GetGlyphIndexByCodepoint(unsigned codepoint) const {
     return codepoint < 256 ? glyphIndexArray[codepoint] : missingGlyphIndex;

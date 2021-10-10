@@ -15,7 +15,9 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "build.h"
+// modified 10.10.2021 (Wilhelm Schnepp): change include path to match adjusted cmake file structure
+
+#include <thorax_truetype/renderer/build.h>
 #include <algorithm>
 #include <cstdio>
 #include <functional>

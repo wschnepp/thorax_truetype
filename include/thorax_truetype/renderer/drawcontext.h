@@ -15,9 +15,11 @@
 //
 //===----------------------------------------------------------------------===//
 
+// modified 10.10.2021 (Wilhelm Schnepp): change include path to match adjusted cmake file structure
+
 #pragma once
 #include "types.h"
-#include <truetype/thorax_truetype.h>
+#include <thorax_truetype/thorax_truetype.h>
 
 //==============================================================================
 // ShapeBuilder API

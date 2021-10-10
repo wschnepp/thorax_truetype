@@ -15,8 +15,11 @@
 //
 //===----------------------------------------------------------------------===//
 
-#include "build.h"
-#include "drawcontext.h"
+// modified 10.10.2021 (Wilhelm Schnepp): change include path to match adjusted cmake file structure
+
+#include <thorax_truetype/renderer/build.h>
+#include <thorax_truetype/renderer/drawcontext.h>
+
 #include <utility>
 #include <cassert>
 #include <cmath>
