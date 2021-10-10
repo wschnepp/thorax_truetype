@@ -361,11 +361,3 @@ struct FontInfo {
     const char* indexToLocation;
     const MaximumProfile* maximumProfile;
 };
-
-//==============================================================================
-//
-//==============================================================================
-
-#ifdef THORAX_TRUETYPE_IMPL
-#include "thorax_truetype.cpp"
-#endif
