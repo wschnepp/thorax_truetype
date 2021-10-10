@@ -42,27 +42,13 @@ bool FontRenderInfo::Initialize(const Font* font) {
 	size_t numGlyphs = fontInfo.maximumProfile->numGlyphs;
 
 	// Calculate the codes for the sorted glyphs.
-	struct GlyphCacheEntry {
-		GlyphCacheEntry() = default;
-		GlyphCacheEntry(const GlyphData* glyphData, int index) : glyphData(glyphData), index(index) {}
-		const GlyphData* glyphData;
-		int index;
-	};
-	DynamicArray<GlyphCacheEntry> cache(numGlyphs);
-	size_t numSimpleGlyphs = 0;
-	size_t numCompoundGlyphs = 0;
-	for (unsigned i = 0, e = (unsigned)numGlyphs; i < e; i++) {
-		auto glyphData = fontInfo.GetGlyphDataByIndex(i);
-		if (glyphData && glyphData->numberOfContours < 0)
-			cache.Push(glyphData, ~(int)numCompoundGlyphs++);
-		else
-			cache.Push(glyphData, (int)numSimpleGlyphs++);
-	}
+	GlyphCache glyphCache;
+	glyphCache.Initialize(fontInfo, numGlyphs);
 
 	// Create the codepointIndex table.
 	codepointIndex = new int[0x10000];
 	for (size_t i = 0; i < 0x10000; i++)
-		codepointIndex[i] = cache[fontInfo.GetGlyphIndexByCodepoint((unsigned)i)].index;
+		codepointIndex[i] = glyphCache.cache[fontInfo.GetGlyphIndexByCodepoint((unsigned)i)].index;
 
 	// Shape building buffers.
 	DynamicArray<GlyphPoint> glyphPoints = DynamicArray<GlyphPoint>(fontInfo.maximumProfile->maxPoints);
@@ -118,13 +104,13 @@ bool FontRenderInfo::Initialize(const Font* font) {
 
 	// Count all of the shapes and the compound elements.
 	// Allocate the glyph info data structures.
-	simpleGlyphInfos = Array<SimpleGlyphInfo>(numSimpleGlyphs + 1);
-	compoundGlyphInfos = Array<CompoundGlyphInfo>(numCompoundGlyphs + 1);
+	simpleGlyphInfos = Array<SimpleGlyphInfo>(glyphCache.numSimpleGlyphs + 1);
+	compoundGlyphInfos = Array<CompoundGlyphInfo>(glyphCache.numCompoundGlyphs + 1);
 	unsigned totalShapes = 0;
 	unsigned totalCompoundElements = 0;
 	for (size_t i = 0; i < numGlyphs; i++) {
-		auto index = cache[i].index;
-		auto glyphData = cache[i].glyphData;
+		auto index = glyphCache.cache[i].index;
+		auto glyphData = glyphCache.cache[i].glyphData;
 		auto advanceWidth = (float)(int)fontInfo.GetHorizontalMetricByIndex((unsigned)i).advanceWidth;
 		if (index >= 0) {
 			auto count = glyphData ? (unsigned)ProcessGlyph(glyphData, nullptr) : 0;
@@ -138,8 +124,8 @@ bool FontRenderInfo::Initialize(const Font* font) {
 			totalCompoundElements += count;
 		}
 	}
-	simpleGlyphInfos[numSimpleGlyphs].firstShape = totalShapes;
-	compoundGlyphInfos[numCompoundGlyphs].firstElement = totalCompoundElements;
+	simpleGlyphInfos[glyphCache.numSimpleGlyphs].firstShape = totalShapes;
+	compoundGlyphInfos[glyphCache.numCompoundGlyphs].firstElement = totalCompoundElements;
 
 	// Allocate storage
 	if (!totalShapes) return Clear(), false;
@@ -148,13 +134,13 @@ bool FontRenderInfo::Initialize(const Font* font) {
 	compoundElements = Array<CompoundElement>(totalCompoundElements);
 	Array<Shape> tempShapes(totalShapes);
 	Array<GlyphReference> references(fontInfo.maximumProfile->maxComponentElements);
-	Array<BuilderMesh*> builders(numSimpleGlyphs);
+	Array<BuilderMesh*> builders(glyphCache.numSimpleGlyphs);
 
 	// Iterate through the glyphs a second time and fill out the now-allocated glyph data.
 	auto totalNodeCount = 0u;
 	for (size_t i = 0; i < numGlyphs; i++) {
-		auto index = cache[i].index;
-		auto glyphData = cache[i].glyphData;
+		auto index = glyphCache.cache[i].index;
+		auto glyphData = glyphCache.cache[i].glyphData;
 		if (index >= 0) {
 			auto& glyphInfo = simpleGlyphInfos[index];
 			glyphInfo.entryNode = totalNodeCount;
@@ -171,7 +157,7 @@ bool FontRenderInfo::Initialize(const Font* font) {
 			auto elements = compoundElements + (size_t)compoundGlyphInfos[~index].firstElement;
 			for (size_t j = 0; j < numCompounds; j++) {
 				auto& ref = references[j];
-				elements[j].glyphID = cache[ref.glyphIndex].index;
+				elements[j].glyphID = glyphCache.cache[ref.glyphIndex].index;
 				elements[j].transform = Matrix2x3(ref.x_x, ref.y_x, ref.offset_x, ref.x_y, ref.y_y, ref.offset_y);
 			}
 		}
@@ -180,7 +166,7 @@ bool FontRenderInfo::Initialize(const Font* font) {
 	// Allocate final shape and node array and build the BVHs.
 	nodes = Array<Box4Node>(totalNodeCount);
 	shapes = Array<Shape>(totalShapes);
-	for (size_t i = 0; i < numSimpleGlyphs; i++) {
+	for (size_t i = 0; i < glyphCache.numSimpleGlyphs; i++) {
 		if (!builders[i]) continue;
 		auto glyphInfo = simpleGlyphInfos + i;
 		builders[i]->TranscribeBVH(nodes + (size_t)glyphInfo->entryNode, shapes, glyphInfo->firstShape);
@@ -260,3 +246,16 @@ size_t FontRenderInfo::LayoutGlyphs(Box4NodeRef* glyphRefs,
 	}
 	return nextGlyphRef - glyphRefs;
 }
+
+void FontRenderInfo::GlyphCache::Initialize(FontInfo& fontInfo, size_t numGlyphs)
+{
+	cache = DynamicArray<GlyphCacheEntry>(numGlyphs);
+	numSimpleGlyphs = 0;
+	numCompoundGlyphs = 0;
+	for (unsigned i = 0, e = (unsigned)numGlyphs; i < e; i++) {
+		auto glyphData = fontInfo.GetGlyphDataByIndex(i);
+		if (glyphData && glyphData->numberOfContours < 0)
+			cache.Push(glyphData, ~(int)numCompoundGlyphs++);
+		else
+			cache.Push(glyphData, (int)numSimpleGlyphs++);
+	}

@@ -31,6 +31,23 @@ struct FontRenderInfo {
 	void Clear();
 	size_t LayoutGlyphs(Box4NodeRef* glyphRefs, int meshIndex, const unsigned* codepoints, size_t numCodepoints);
 
+private:
+	
+	struct GlyphCacheEntry {
+		GlyphCacheEntry() = default;
+		GlyphCacheEntry(const GlyphData* glyphData, int index);
+		const GlyphData* glyphData;
+		int index;
+	};
+
+	struct GlyphCache {
+		size_t numSimpleGlyphs;
+		size_t numCompoundGlyphs;
+		DynamicArray<GlyphCacheEntry> cache;
+
+		void Initialize(FontInfo& fontInfo, size_t numGlyphs);
+	};
+
 	struct SimpleGlyphInfo {
 		unsigned firstShape;
 		unsigned entryNode;
