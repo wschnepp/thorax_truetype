@@ -1,4 +1,4 @@
-//===- drawcontext.h -------------------------------------------*- C++ --*-===//
+//===- FontRenderInfo.h -------------------------------------------*- C++ --*-===//
 // Copyright 2017  Warren Hunt
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -48,4 +48,51 @@ struct DrawContext {
 
 	static DrawContext* Create(unsigned numThreads = 1);
 	static void Destroy(DrawContext*& context);
+};
+
+//==============================================================================
+// FontRenderInfo
+//==============================================================================
+
+struct FontRenderInfo {
+	bool Initialize(const Font* font);
+	void Clear();
+	size_t LayoutGlyphs(Box4NodeRef* glyphRefs, int meshIndex, const unsigned* codepoints, size_t numCodepoints);
+
+	struct SimpleGlyphInfo {
+		unsigned firstShape;
+		unsigned entryNode;
+		float advanceWidth;
+	};
+
+	struct CompoundGlyphInfo {
+		unsigned firstElement;
+		float advanceWidth;
+	};
+
+	struct CompoundElement {
+		Matrix2x3 transform;
+		unsigned glyphID;
+	};
+
+	// codepoint->index buffer
+	// Negative codepoints indicate compound glyphs, the index i for i < 0 is compoundGlyphInfos[~i].
+	int* codepointIndex = nullptr;
+
+	// Glyph information buffers.
+	Array<SimpleGlyphInfo> simpleGlyphInfos;     //
+	Array<CompoundGlyphInfo> compoundGlyphInfos; //
+	Array<CompoundElement> compoundElements;     //
+	Array<Box4Node> nodes;                       // List of all BVH nodes used by all glyphs.
+	Array<Shape> shapes;                         // List of all shapes used by all glyphs.
+
+	// All values in master grids units.
+	float emsPerUnit = 0;
+	float ascent = 0;         // Distance from baseline of highest ascender.
+	float descent = 0;        // Distance from baseline of lowest descender.
+	float lineGap = 0;        // Typographic line gap.
+	float lineSpacing = 0;    // Total advance height from line to line.
+	float caretSlopeRise = 0; // Used to calculate the slope of the caret (rise/run) set to 1 for vertical caret.
+	float caretSlopeRun = 0;  // 0 for vertical
+	float caretOffset = 0;    // set value to 0 for non-slanted fonts
 };

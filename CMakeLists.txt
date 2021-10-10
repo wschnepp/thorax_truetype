@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_library(thorax_truetype "source/thorax_truetype.cpp"
+	"source/renderer/FontRenderInfo.cpp"
+	"source/renderer/ShapeBuilder.cpp"
 	"source/renderer/bvh.cpp"
 	"source/renderer/drawcontext.cpp")
 
