@@ -35,7 +35,68 @@ struct ShapeBuilder {
 	                              const size_t* contourSizes,
 	                              size_t numCountours,
 	                              Shape* shapes) = 0;
+};
 
-  public:
-	static std::shared_ptr<ShapeBuilder> GetDefaultShapeBuilderInstance();
+struct ShapeBuilderDefaultImpl final : ShapeBuilder {
+
+	void Clear(size_t reserve) override;
+	size_t GenerateShapes(const Segment* segments,
+	                      const size_t* contourSizes,
+	                      size_t numCountours,
+	                      Shape* shapes) override;
+
+  private:
+	struct EdgeEqn {
+		EdgeEqn(short2 vert, short2 next);
+		float XofY(float Y) const;
+
+		float a;
+		float b;
+	};
+
+	struct Event {
+		Event() = default;
+		Event(unsigned short segmentID, bool isBegin, bool isUp, const short2& vert);
+		bool operator<(const Event& a) const;
+		unsigned short segmentID;
+		bool isBegin;
+		bool isUp;
+		short2 vert;
+	};
+
+	struct Edge {
+		Edge() = default;
+		Edge(float x, unsigned short segmentID, unsigned short slabID);
+		bool operator<(const Edge& a) const;
+		float x;
+		unsigned short segmentID;
+		unsigned short slabID;
+	};
+
+	struct Slab {
+		Slab() = default;
+		Slab(float y_min, unsigned short upSegmentID, unsigned short dnSegmentID);
+		float y_min;
+		unsigned short upSegmentID;
+		unsigned short dnSegmentID;
+	};
+
+
+	void ProcessSegment(short2 p0, short2 p1, short2 p2);
+
+	void PushTrapezoid(const Slab& slab, float y_max);
+
+	static void InsertEdge(DynamicArray<ShapeBuilderDefaultImpl::Edge>& edges,
+	                       float x,
+	                       unsigned short segmentID,
+	                       unsigned short slabID);
+	static unsigned short DeleteEdge(DynamicArray<ShapeBuilderDefaultImpl::Edge>& edges, unsigned short segmentID);
+
+	DynamicArray<EdgeEqn> eqns;
+	DynamicArray<Event> events;
+	DynamicArray<Edge> upEdges;
+	DynamicArray<Edge> dnEdges;
+	DynamicArray<Slab> slabs;
+	Shape* shapes;
+	size_t numShapes;
 };

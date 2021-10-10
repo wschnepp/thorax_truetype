@@ -68,8 +68,8 @@ bool FontRenderInfo::Initialize(const Font* font) {
 	DynamicArray<GlyphPoint> glyphPoints = DynamicArray<GlyphPoint>(fontInfo.maximumProfile->maxPoints);
 	DynamicArray<Segment> segments = DynamicArray<Segment>(fontInfo.maximumProfile->maxPoints * 3);
 	DynamicArray<size_t> contourSizes = DynamicArray<size_t>(fontInfo.maximumProfile->maxContours);
-	auto builder = ShapeBuilder::GetDefaultShapeBuilderInstance();
-	builder->Clear(fontInfo.maximumProfile->maxPoints * 3);
+	ShapeBuilderDefaultImpl builder;
+	builder.Clear(fontInfo.maximumProfile->maxPoints * 3);
 
 	auto ProcessGlyph = [&glyphPoints, &segments, &contourSizes, &builder](const GlyphData* glyphData, Shape* shapes) {
 		// Define a helper lambda for processing each contour.
@@ -113,7 +113,7 @@ bool FontRenderInfo::Initialize(const Font* font) {
 			ProcessContour(glyphPoints.data + glyphData->endPtsOfContours[i - 1] + 1,
 			               glyphData->endPtsOfContours[i] - glyphData->endPtsOfContours[i - 1]);
 
-		return builder->GenerateShapes(segments.data, contourSizes.data, contourSizes.size, shapes);
+		return builder.GenerateShapes(segments.data, contourSizes.data, contourSizes.size, shapes);
 	};
 
 	// Count all of the shapes and the compound elements.

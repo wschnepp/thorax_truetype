@@ -61,78 +61,45 @@ static inline UTMatrix ComputeViewFromSample(Vector x, Vector y) {
 }
 
 //==============================================================================
+// ShapeImplementations
+//==============================================================================
+
+//EdgeEqn
+
+ShapeBuilderDefaultImpl::EdgeEqn::EdgeEqn(short2 vert, short2 next) : 
+	a((float)(next.x - vert.x) / (next.y - vert.y)), b(vert.x - a * vert.y)
+{}
+
+float ShapeBuilderDefaultImpl::EdgeEqn::XofY(float Y) const { return a * Y + b; }
+
+//Event
+
+ShapeBuilderDefaultImpl::Event::Event(unsigned short segmentID, bool isBegin, bool isUp, const short2& vert) :
+	segmentID(segmentID), isBegin(isBegin), isUp(isUp), vert(vert) 
+{}
+
+bool ShapeBuilderDefaultImpl::Event::operator<(const Event& a) const { return vert.y < a.vert.y; }
+
+//Edge
+
+ShapeBuilderDefaultImpl::Edge::Edge(float x, unsigned short segmentID, unsigned short slabID) :
+	segmentID(segmentID), slabID(slabID), x(x) 
+{}
+
+bool ShapeBuilderDefaultImpl::Edge::operator<(const Edge& a) const { return x < a.x; }
+
+//Slab
+
+ShapeBuilderDefaultImpl::Slab::Slab(float y_min, unsigned short upSegmentID, unsigned short dnSegmentID) :
+	y_min(y_min), upSegmentID(upSegmentID), dnSegmentID(dnSegmentID)
+{}
+
+//==============================================================================
 // ShapeBuilderImpl
 //==============================================================================
 
-struct ShapeBuilderImpl final : ShapeBuilder {
-	struct EdgeEqn {
-		EdgeEqn(short2 vert, short2 next) : a((float)(next.x - vert.x) / (next.y - vert.y)), b(vert.x - a * vert.y) {}
-		float XofY(float Y) const { return a * Y + b; }
 
-		float a;
-		float b;
-	};
-
-	struct Event {
-		Event() = default;
-		Event(unsigned short segmentID, bool isBegin, bool isUp, const short2& vert)
-		    : segmentID(segmentID), isBegin(isBegin), isUp(isUp), vert(vert) {}
-		bool operator<(const Event& a) const { return vert.y < a.vert.y; }
-		unsigned short segmentID;
-		bool isBegin;
-		bool isUp;
-		short2 vert;
-	};
-
-	struct Edge {
-		Edge() = default;
-		Edge(float x, unsigned short segmentID, unsigned short slabID) : segmentID(segmentID), slabID(slabID), x(x) {}
-		bool operator<(const Edge& a) const { return x < a.x; }
-		float x;
-		unsigned short segmentID;
-		unsigned short slabID;
-	};
-
-	struct Slab {
-		Slab() = default;
-		Slab(float y_min, unsigned short upSegmentID, unsigned short dnSegmentID)
-		    : y_min(y_min), upSegmentID(upSegmentID), dnSegmentID(dnSegmentID) {}
-		float y_min;
-		unsigned short upSegmentID;
-		unsigned short dnSegmentID;
-	};
-
-	void Clear(size_t reserve) override;
-	size_t GenerateShapes(const Segment* segments,
-	                      const size_t* contourSizes,
-	                      size_t numCountours,
-	                      Shape* shapes) override;
-
-	void ProcessSegment(short2 p0, short2 p1, short2 p2);
-
-	void PushTrapezoid(const Slab& slab, float y_max) {
-		auto& up = eqns[slab.upSegmentID];
-		auto& dn = eqns[slab.dnSegmentID];
-		auto y0 = slab.y_min;
-		auto y1 = y_max;
-		auto x0 = up.XofY(y0);
-		auto x1 = up.XofY(y1);
-		auto x2 = dn.XofY(y1);
-		auto x3 = dn.XofY(y0);
-		if (shapes) shapes[numShapes] = Shape(x0, x1, x2, x3, y0, y1);
-		numShapes++;
-	}
-
-	DynamicArray<EdgeEqn> eqns;
-	DynamicArray<Event> events;
-	DynamicArray<Edge> upEdges;
-	DynamicArray<Edge> dnEdges;
-	DynamicArray<Slab> slabs;
-	Shape* shapes;
-	size_t numShapes;
-};
-
-void ShapeBuilderImpl::Clear(size_t reserve) {
+void ShapeBuilderDefaultImpl::Clear(size_t reserve) {
 	eqns = DynamicArray<EdgeEqn>(reserve);
 	events = DynamicArray<Event>(reserve * 2);
 	upEdges = DynamicArray<Edge>(reserve);
@@ -140,7 +107,7 @@ void ShapeBuilderImpl::Clear(size_t reserve) {
 	slabs = DynamicArray<Slab>(reserve * 2);
 }
 
-void ShapeBuilderImpl::ProcessSegment(short2 p0, short2 p1, short2 p2) {
+void ShapeBuilderDefaultImpl::ProcessSegment(short2 p0, short2 p1, short2 p2) {
 	// Create the curves and generate the trapezoid event list.
 	if (p0.y == p2.y) return; // Ignore flat horizontal segments.
 
@@ -167,17 +134,32 @@ void ShapeBuilderImpl::ProcessSegment(short2 p0, short2 p1, short2 p2) {
 	eqns.Push(p0, p2);
 }
 
-static void InsertEdge(DynamicArray<ShapeBuilderImpl::Edge>& edges,
+void ShapeBuilderDefaultImpl::PushTrapezoid(const Slab& slab, float y_max) {
+	auto& up = eqns[slab.upSegmentID];
+	auto& dn = eqns[slab.dnSegmentID];
+	auto y0 = slab.y_min;
+	auto y1 = y_max;
+	auto x0 = up.XofY(y0);
+	auto x1 = up.XofY(y1);
+	auto x2 = dn.XofY(y1);
+	auto x3 = dn.XofY(y0);
+	if (shapes) shapes[numShapes] = Shape(x0, x1, x2, x3, y0, y1);
+	numShapes++;
+}
+
+
+void ShapeBuilderDefaultImpl::InsertEdge(DynamicArray<ShapeBuilderDefaultImpl::Edge>& edges,
                        float x,
                        unsigned short segmentID,
                        unsigned short slabID) {
 	size_t i = edges.size;
 	while (i && edges[i - 1].x < x) i--;
 	for (auto j = edges.size++; j > i; j--) edges[j] = edges[j - 1];
-	edges[i] = ShapeBuilderImpl::Edge(x, segmentID, slabID);
+	edges[i] = ShapeBuilderDefaultImpl::Edge(x, segmentID, slabID);
 };
 
-static unsigned short DeleteEdge(DynamicArray<ShapeBuilderImpl::Edge>& edges, unsigned short segmentID) {
+unsigned short ShapeBuilderDefaultImpl::DeleteEdge(DynamicArray<ShapeBuilderDefaultImpl::Edge>& edges,
+                                                          unsigned short segmentID) {
 	size_t i = 0;
 	while (i < edges.size && edges[i].segmentID != segmentID) i++;
 	auto slabID = edges[i].slabID;
@@ -186,7 +168,7 @@ static unsigned short DeleteEdge(DynamicArray<ShapeBuilderImpl::Edge>& edges, un
 	return slabID;
 };
 
-size_t ShapeBuilderImpl::GenerateShapes(const Segment* segments,
+size_t ShapeBuilderDefaultImpl::GenerateShapes(const Segment* segments,
                                         const size_t* contourSizes,
                                         size_t numCountours,
                                         Shape* out) {
@@ -262,9 +244,6 @@ size_t ShapeBuilderImpl::GenerateShapes(const Segment* segments,
 	} while (event != events.end());
 	return numShapes;
 }
-
-//make sure to cleanup pointer after use with delete 
-std::shared_ptr<ShapeBuilder> ShapeBuilder::GetDefaultShapeBuilderInstance() { return std::make_shared<ShapeBuilderImpl>(); }
 
 //==============================================================================
 // TileImpl
