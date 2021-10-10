@@ -23,34 +23,6 @@
 #include <thorax_truetype/thorax_truetype.h>
 
 //==============================================================================
-// ShapeBuilder API
-//==============================================================================
-
-struct ShapeBuilder {
-	virtual ~ShapeBuilder() {}
-	virtual void Clear(size_t reserve = 0) = 0;
-	virtual size_t GenerateShapes(const Segment* segments,
-	                              const size_t* contourSizes,
-	                              size_t numCountours,
-	                              Shape* shapes) = 0;
-};
-
-//==============================================================================
-// Drawing Context API
-//==============================================================================
-
-struct DrawContext {
-	virtual size_t SetRenderTarget(unsigned* renderTarget, int width, int height, size_t stride) = 0;
-	virtual void SetViewport(float lower_x, float lower_y, float upper_x, float upper_y) = 0;
-	virtual void SetFilterKernel(float x0, float y0, float x1, float y1) = 0; //< in screen space (1 == 1 pixel)
-	virtual void Draw(const Mesh* scene, const Matrix2x3& screenFromLayout) = 0;
-	virtual ~DrawContext() {}
-
-	static DrawContext* Create(unsigned numThreads = 1);
-	static void Destroy(DrawContext*& context);
-};
-
-//==============================================================================
 // FontRenderInfo
 //==============================================================================
 

@@ -263,6 +263,9 @@ size_t ShapeBuilderImpl::GenerateShapes(const Segment* segments,
 	return numShapes;
 }
 
+//make sure to cleanup pointer after use with delete 
+std::shared_ptr<ShapeBuilder> ShapeBuilder::GetDefaultShapeBuilderInstance() { return std::make_shared<ShapeBuilderImpl>(); }
+
 //==============================================================================
 // TileImpl
 //==============================================================================

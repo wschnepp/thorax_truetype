@@ -23,19 +23,6 @@
 #include <thorax_truetype/thorax_truetype.h>
 
 //==============================================================================
-// ShapeBuilder API
-//==============================================================================
-
-struct ShapeBuilder {
-	virtual ~ShapeBuilder() {}
-	virtual void Clear(size_t reserve = 0) = 0;
-	virtual size_t GenerateShapes(const Segment* segments,
-	                              const size_t* contourSizes,
-	                              size_t numCountours,
-	                              Shape* shapes) = 0;
-};
-
-//==============================================================================
 // Drawing Context API
 //==============================================================================
 

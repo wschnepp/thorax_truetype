@@ -1,3 +1,4 @@
+#pragma once 
 //===- ShapeBuilder.h -------------------------------------------*- C++ --*-===//
 // Copyright 2017  Warren Hunt
 //
@@ -18,9 +19,10 @@
 // modified 10.10.2021 (Wilhelm Schnepp): change include path to match adjusted cmake file structure
 // modified 10.10.2021 (Wilhelm Schnepp): Extract ShapeBuilder and FontRenderInfo to separate files
 
-#pragma once
 #include "types.h"
 #include <thorax_truetype/thorax_truetype.h>
+
+#include <memory>
 
 //==============================================================================
 // ShapeBuilder API
@@ -33,4 +35,7 @@ struct ShapeBuilder {
 	                              const size_t* contourSizes,
 	                              size_t numCountours,
 	                              Shape* shapes) = 0;
+
+  public:
+	static std::shared_ptr<ShapeBuilder> GetDefaultShapeBuilderInstance();
 };
