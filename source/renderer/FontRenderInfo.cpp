@@ -187,7 +187,8 @@ void FontRenderInfo::Clear() {
 size_t FontRenderInfo::LayoutGlyphs(Box4NodeRef* glyphRefs,
                                     int meshIndex,
                                     const unsigned* codepoints,
-                                    size_t numCodepoints) {
+                                    size_t numCodepoints) 
+{
 	if (!glyphRefs) {
 		// Count the drawn glyphs.
 		size_t drawnGlyphCount = 0;
@@ -250,6 +251,7 @@ size_t FontRenderInfo::LayoutGlyphs(Box4NodeRef* glyphRefs,
 void FontRenderInfo::GlyphCache::Initialize(FontInfo& fontInfo, size_t numGlyphs)
 {
 	cache = DynamicArray<GlyphCacheEntry>(numGlyphs);
+	numGlyphs = numGlyphs;
 	numSimpleGlyphs = 0;
 	numCompoundGlyphs = 0;
 	for (unsigned i = 0, e = (unsigned)numGlyphs; i < e; i++) {
@@ -259,3 +261,6 @@ void FontRenderInfo::GlyphCache::Initialize(FontInfo& fontInfo, size_t numGlyphs
 		else
 			cache.Push(glyphData, (int)numSimpleGlyphs++);
 	}
+}
+
+FontRenderInfo::GlyphCacheEntry::GlyphCacheEntry(const GlyphData* glyphData, int index) : glyphData(glyphData), index(index) {}

@@ -41,6 +41,7 @@ private:
 	};
 
 	struct GlyphCache {
+		size_t numGlyphs;
 		size_t numSimpleGlyphs;
 		size_t numCompoundGlyphs;
 		DynamicArray<GlyphCacheEntry> cache;
