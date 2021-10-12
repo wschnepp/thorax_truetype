@@ -20,18 +20,15 @@
 
 #pragma once
 #include "types.h"
-#include <thorax_truetype/thorax_truetype.h>
 
-//==============================================================================
-// FontRenderInfo
-//==============================================================================
+#include <thorax_truetype/grid_types.h>
+#include <thorax_truetype/thorax_truetype.h>
 
 struct FontRenderInfo {
 	bool Initialize(const Font* font);
 	void Clear();
 	size_t LayoutGlyphs(Box4NodeRef* glyphRefs, int meshIndex, const unsigned* codepoints, size_t numCodepoints);
-
-private:
+	size_t LayoutGlyphs(Grid::GridRef* glyphRefs, int meshIndex, const unsigned* codepoints, size_t numCodepoints);
 	
 	struct GlyphCacheEntry {
 		GlyphCacheEntry() = default;
@@ -48,10 +45,11 @@ private:
 
 		void Initialize(FontInfo& fontInfo, size_t numGlyphs);
 	};
-
+	
 	struct SimpleGlyphInfo {
 		unsigned firstShape;
 		unsigned entryNode;
+		unsigned gridOffset;
 		float advanceWidth;
 	};
 
@@ -61,7 +59,7 @@ private:
 	};
 
 	struct CompoundElement {
-		Matrix2x3 transform;
+		::Matrix2x3 transform;
 		unsigned glyphID;
 	};
 
@@ -74,7 +72,10 @@ private:
 	Array<CompoundGlyphInfo> compoundGlyphInfos; //
 	Array<CompoundElement> compoundElements;     //
 	Array<Box4Node> nodes;                       // List of all BVH nodes used by all glyphs.
-	Array<Shape> shapes;                         // List of all shapes used by all glyphs.
+	Array<::Shape> shapes;                       // List of all shapes used by all glyphs.
+	Array<Grid::shape_ptr> shape_ptrs;
+	Array<Grid::GlyphGridCell> glyph_grid_cells;
+	Array<Grid::GlyphGrid> glyph_grids;
 
 	// All values in master grids units.
 	float emsPerUnit = 0;

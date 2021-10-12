@@ -9,6 +9,9 @@ add_library(thorax_truetype "source/thorax_truetype.cpp"
 	"source/renderer/FontRenderInfo.cpp"
 	"source/renderer/ShapeBuilder.cpp"
 	"source/renderer/bvh.cpp"
-	"source/renderer/drawcontext.cpp")
+	"source/renderer/drawcontext.cpp" 
+	"source/grid_builder.cpp"
+	"source/thorax_bridge.cpp"
+	)
 
 target_include_directories(thorax_truetype PUBLIC "include")
