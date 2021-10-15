@@ -23,7 +23,9 @@
 //==============================================================================
 // Abstraction of vector hardware.
 //==============================================================================
-
+#if !defined(__AVX2__)
+    #error("AVX and FMA instruction sets are required for thorax, your processor/compiler/OS does not seem to support them. Also make sure they are available in every project that uses thorax")
+#endif
 __forceinline float floatInfinity() {
     static const unsigned bits = 0x7f800000u;
     return *(float*)&bits;

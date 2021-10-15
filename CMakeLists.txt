@@ -14,4 +14,8 @@ add_library(thorax_truetype "source/thorax_truetype.cpp"
 	"source/thorax_bridge.cpp"
 	)
 
+if(MSVC)
+    target_compile_options(thorax_truetype PRIVATE /arch:AVX2)
+endif()
+
 target_include_directories(thorax_truetype PUBLIC "include")
