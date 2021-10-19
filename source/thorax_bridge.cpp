@@ -55,7 +55,7 @@ Grid::TextGrid* InitializeText(std::string path, std::string filename)
 
 	std::string words = "To be, or not to be, that is the question :";
 
-	unsigned points[4096];
+	unsigned* points = new unsigned[4096];
 	int hres = 0;
 	int vresmax = 0;
 	int hresmax = 0;
@@ -81,5 +81,6 @@ Grid::TextGrid* InitializeText(std::string path, std::string filename)
 	Grid::TextGrid *tgrid = GetTextGridCPU(ft_render_info->shapes, ft_render_info->glyph_grids,
 		ft_render_info->glyph_grid_cells, ft_render_info->shape_ptrs);
 	GridBuild(tgrid, glyphRefs, numRefs, hresmax, vresmax);
+	delete[] points;
 	return tgrid;
 }
