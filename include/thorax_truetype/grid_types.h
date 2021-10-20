@@ -12,6 +12,8 @@
 #pragma once
 #define CUDA_HOST_DEVICE 
 
+#include <cstdint>
+
 namespace Grid
 {
 	struct GridBox {
@@ -126,7 +128,8 @@ namespace Grid
 		float highest_y;
 		int ptr_fixup;
 		int first_cell;
-		bool null;
+		std::int32_t null; //dont save this as boolean to consistently match size of glsl bool (4 bytes)
+	    std::int32_t padding;
 	};
 
 	struct GlyphPtr {
