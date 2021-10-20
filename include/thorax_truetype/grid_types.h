@@ -129,7 +129,7 @@ namespace Grid
 	    std::int32_t ptr_fixup;
 	    std::int32_t first_cell;
 		std::int32_t null; //dont save this as boolean to consistently match size of glsl bool (4 bytes)
-	    std::int32_t padding;
+	    const std::int32_t padding = 0;
 	};
 
 	struct GlyphPtr {
@@ -151,7 +151,7 @@ namespace Grid
 	    float color_a;
 	    std::int32_t hres, vres;
 	    std::int32_t dbgMode;
-	    std::int32_t padding0; // add padding here to get to 4 byte alignment
+	    const std::int32_t padding0 = 0; // add padding here to get to 4 byte alignment
 	};
 
 	struct TextGrid {
