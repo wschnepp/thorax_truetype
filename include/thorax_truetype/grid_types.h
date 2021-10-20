@@ -132,8 +132,8 @@ namespace Grid
 	struct GlyphPtr {
 		int instance;
 		int ptr;
-		int offset;
-		int count;
+		//int offset; //unused member?
+		//int count; //unused member?
 		GridMatrix2x3 transform_to_local;
 	};
 
