@@ -100,13 +100,13 @@ namespace Grid
 
 	struct GridRef {
 		GridMatrix2x3 objectFromParent;
-		int codeindex;
-		unsigned nodeIndex;
+		std::int32_t codeindex;
+		std::uint32_t nodeIndex;
 	};
 
 	struct GridCell {
-		int offset;
-		int count;
+		std::int32_t offset;
+		std::int32_t count;
 	};
 
 	//why was this inheriting and hiding the members, and why were there two different structs?
@@ -116,25 +116,25 @@ namespace Grid
 	};*/
 
 	struct shape_ptr {
-		int ptr;
-		int id;
+	    std::int32_t ptr;
+	    std::int32_t id;
 	};
 
 	struct GlyphGrid {
-		size_t hres, vres;
+	    std::int64_t hres, vres;
 		float lowest_x;
 		float lowest_y;
 		float highest_x;
 		float highest_y;
-		int ptr_fixup;
-		int first_cell;
+	    std::int32_t ptr_fixup;
+	    std::int32_t first_cell;
 		std::int32_t null; //dont save this as boolean to consistently match size of glsl bool (4 bytes)
 	    std::int32_t padding;
 	};
 
 	struct GlyphPtr {
-		int instance;
-		int ptr;
+	    std::int32_t instance;
+	    std::int32_t ptr;
 		//int offset; //unused member?
 		//int count; //unused member?
 		GridMatrix2x3 transform_to_local;
@@ -149,13 +149,13 @@ namespace Grid
 	    float color_g;
 	    float color_b;
 	    float color_a;
-	    int hres, vres;
-	    int dbgMode;
-	    int padding0; // add padding here to get to 4 byte alignment
+	    std::int32_t hres, vres;
+	    std::int32_t dbgMode;
+	    std::int32_t padding0; // add padding here to get to 4 byte alignment
 	};
 
 	struct TextGrid {
-		int hres, vres;
+	    std::int32_t hres, vres;
 		float lowest_x;
 		float lowest_y;
 		float highest_x;
@@ -166,11 +166,11 @@ namespace Grid
 		GridCell *glyph_grid_cells;
 		GridShape *shapes;
 		shape_ptr *shape_ptrs;
-		int cell_count;
-		int glyph_ptr_count;
-		int glyph_grid_count;
-		int glyph_grid_cell_count;
-		int shape_count;
-		int shape_ptr_count;
+	    std::int32_t cell_count;
+	    std::int32_t glyph_ptr_count;
+	    std::int32_t glyph_grid_count;
+	    std::int32_t glyph_grid_cell_count;
+	    std::int32_t shape_count;
+	    std::int32_t shape_ptr_count;
 	};
 }
