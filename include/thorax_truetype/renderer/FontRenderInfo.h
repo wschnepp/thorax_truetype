@@ -74,7 +74,7 @@ struct FontRenderInfo {
 	Array<Box4Node> nodes;                       // List of all BVH nodes used by all glyphs.
 	Array<::Shape> shapes;                       // List of all shapes used by all glyphs.
 	Array<Grid::shape_ptr> shape_ptrs;
-	Array<Grid::GlyphGridCell> glyph_grid_cells;
+	Array<Grid::GridCell> glyph_grid_cells;
 	Array<Grid::GlyphGrid> glyph_grids;
 
 	// All values in master grids units.

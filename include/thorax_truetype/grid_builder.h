@@ -43,5 +43,5 @@ struct GlyphGridBuilder {
 	int cellCount;
 	int totalRefs;
 	Grid::shape_ptr* shapePtrs;
-	Grid::GlyphGridCell* shapeOffsets;
+	Grid::GridCell* shapeOffsets;
 };

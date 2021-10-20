@@ -180,7 +180,7 @@ bool FontRenderInfo::Initialize(const Font* font) {
 	// Allocate final shape and node array and build the BVHs.
 	shapes = tempShapes;
 	shape_ptrs = Array<Grid::shape_ptr>(totalRefCount);
-	glyph_grid_cells = Array<Grid::GlyphGridCell>(totalCellCount);
+	glyph_grid_cells = Array<Grid::GridCell>(totalCellCount);
 	glyph_grids = Array<Grid::GlyphGrid>(glyphCache.numSimpleGlyphs);
 	int shape_ptr_offset = 0;
 	int grid_cell_offset = 0;
@@ -190,8 +190,8 @@ bool FontRenderInfo::Initialize(const Font* font) {
 			continue;
 		}
 		glyph_grids[i].null = false;
-		memcpy(((Grid::GlyphGridCell*)glyph_grid_cells) + grid_cell_offset, builders[i]->shapeOffsets,
-		       sizeof(Grid::GlyphGridCell) * builders[i]->cellCount);
+		memcpy(((Grid::GridCell*)glyph_grid_cells) + grid_cell_offset, builders[i]->shapeOffsets,
+		       sizeof(Grid::GridCell) * builders[i]->cellCount);
 		memcpy(((Grid::shape_ptr*)shape_ptrs) + shape_ptr_offset, builders[i]->shapePtrs,
 		       sizeof(Grid::shape_ptr) * builders[i]->totalRefs);
 		glyph_grids[i].first_cell = grid_cell_offset;

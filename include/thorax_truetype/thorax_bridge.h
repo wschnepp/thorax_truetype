@@ -17,7 +17,9 @@
 #include "grids.h"
 #include "renderer/drawcontext.h"
 
-Grid::TextGrid* GetTextGridCPU(Array<Shape> &shapes, Array<Grid::GlyphGrid> &glyphGrids, Array<Grid::GlyphGridCell> &gridCells,
+Grid::TextGrid* GetTextGridCPU(Array<Shape>& shapes,
+                               Array<Grid::GlyphGrid>& glyphGrids,
+                               Array<Grid::GridCell>& gridCells,
 	Array<Grid::shape_ptr> &shapePtrs);
 
 Grid::TextGrid* InitializeText(std::string path, std::string filename);

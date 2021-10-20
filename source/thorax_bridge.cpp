@@ -15,7 +15,7 @@
 #include <thorax_truetype/renderer/build.h>
 #include <thorax_truetype/renderer/FontRenderInfo.h>
 
-Grid::TextGrid* GetTextGridCPU(Array<Shape> &shapes, Array<Grid::GlyphGrid> &glyphGrids, Array<Grid::GlyphGridCell> &glyphGridCells,
+Grid::TextGrid* GetTextGridCPU(Array<Shape> &shapes, Array<Grid::GlyphGrid> &glyphGrids, Array<Grid::GridCell> &glyphGridCells,
 	Array<Grid::shape_ptr> &shapePtrs){
 	
 	Grid::GridShape* cpuShapes = new Grid::GridShape[shapes.size];

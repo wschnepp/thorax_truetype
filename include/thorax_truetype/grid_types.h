@@ -102,15 +102,16 @@ namespace Grid
 		unsigned nodeIndex;
 	};
 
-	struct GlyphGridCell {
+	struct GridCell {
 		int offset;
 		int count;
 	};
 
-	struct TextGridCell : public GlyphGridCell {
+	//why was this inheriting and hiding the members, and why were there two different structs?
+    /* struct TextGridCell : public GridCell {
 		int offset;
 		int count;
-	};
+	};*/
 
 	struct shape_ptr {
 		int ptr;
@@ -156,10 +157,10 @@ namespace Grid
 		float lowest_y;
 		float highest_x;
 		float highest_y;
-		TextGridCell *cells;
+		GridCell *cells;
 		GlyphPtr *glyph_ptrs;
 		GlyphGrid *glyph_grids;
-		GlyphGridCell *glyph_grid_cells;
+		GridCell *glyph_grid_cells;
 		GridShape *shapes;
 		shape_ptr *shape_ptrs;
 		int cell_count;

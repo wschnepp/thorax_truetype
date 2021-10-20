@@ -73,11 +73,11 @@ GlyphGridBuilder::GlyphGridBuilder(const Shape* shapes, size_t numShapes, size_t
 	int height =  (int)vres;
 	int width = (int)hres;
 	cellCount = height*width;
-	shapeOffsets = new GlyphGridCell[cellCount];
+	shapeOffsets = new GridCell[cellCount];
 	totalRefs = 0;
 
 	//count the number of shapes in each cell
-	memset(shapeOffsets, 0, sizeof(GlyphGridCell)*cellCount);
+	memset(shapeOffsets, 0, sizeof(GridCell)*cellCount);
 	for (int n = 0;n < numShapes;n++)
 	{
 		Shape shape = shapes[n];
@@ -175,8 +175,8 @@ void GridBuild(TextGrid *grid, const GridRef *input, size_t num_refs, int horizo
 	int height = (int)((highest_y - lowest_y) / vertical_count);
 
 	int grid_index_count = 0;
-	grid->cells = new TextGridCell[horizontal_count*vertical_count];
-	memset(grid->cells, 0, sizeof(TextGridCell)*horizontal_count*vertical_count);
+	grid->cells = new GridCell[horizontal_count*vertical_count];
+	memset(grid->cells, 0, sizeof(GridCell)*horizontal_count*vertical_count);
 	for (int n = 0; n < num_refs; n++)
 	{
 		GridRef gridref = input[n];
