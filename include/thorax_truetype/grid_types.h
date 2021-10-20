@@ -136,6 +136,20 @@ namespace Grid
 		GridMatrix2x3 transform_to_local;
 	};
 
+	struct TextGridDimensions {
+	    float lowest_x;
+	    float lowest_y;
+	    float highest_x;
+	    float highest_y;
+	    float color_r;
+	    float color_g;
+	    float color_b;
+	    float color_a;
+	    int hres, vres;
+	    int dbgMode;
+	    int padding0; // add padding here to get to 4 byte alignment
+	};
+
 	struct TextGrid {
 		int hres, vres;
 		float lowest_x;
